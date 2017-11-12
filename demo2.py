@@ -45,17 +45,16 @@ def berge(g):
   stack = []
   vu = []   #Pour marquer les nodes visités
   previous = {}  #Pour régler le problème d'hier
-  acyclic = True
   l = [node for node in g.nodes()]   #Liste des nodes du graphe
   
-  while l and acyclic: 
+  while l: 
     node = l.pop()   #Premier noeud qu'on visite
     previous[node] = None   #Pas de previous pour celui-là
 
     if node not in vu:   #Si pas déjà visité
       stack.append(node)
       
-      while stack and acyclic:   #Tanqut qu'il y a des noeuds dans le stack
+      while stack:   #Tanqut qu'il y a des noeuds dans le stack
         v = stack.pop()   
         if v not in vu:   
           vu.append(v)   #Marque le noeud
@@ -69,9 +68,9 @@ def berge(g):
           
         elif v in vu:
           #Quand on tombe sur un noeud déjà marqué, il y a un cycle
-          acyclic = False
+          return False
         
-  return acyclic
+  return True
 
 
 def alpha_acyclic(g):
@@ -82,7 +81,8 @@ def alpha_acyclic(g):
 def hypercycle(g):
   if berge(g):
     print("Hypergraphe acyclique au sens de Berge et α-acyclique")
-  elif alpha_acyclic(g):
+  G = incidence_to_primal(g)
+  elif alpha_acyclic(G):
     print("Hypergraphe α-acyclique")
   else:
     print("Hypergraphe ni acyclique au sens de Berge et ni α-acyclique")
