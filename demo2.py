@@ -72,11 +72,49 @@ def berge(g):
         
   return True
 
-
+def clicM_isHyperEdge(g,graph):
+  x = {}
+  prec = None
+  y = [sorted(list(i)) for i in g.edges()]
+  for lst in y:
+    for elem in lst:
+      if 'e' in elem:
+        x.setdefault(elem,set())
+        prec = elem
+      else:
+        x[prec].add(elem)
+  lst = BK(set(),set(graph.nodes()),set(),graph)
+  flag = [False for i in range(len(lst))]
+  for i in range(len(lst)):
+    for key in x:
+      if x[key] == lst[i]:
+        flag[i] == True
+  if False in flag:
+    return False
+  else:
+    return True
+  
 def alpha_acyclic(g):
-  return None
+  graph = incidence_to_primal(g)
+  if clicM_isHyperEdge(g,graph):
+    return True
+  return False
 
-
+def BK(r,p,x,g,sol = [],m = [0]):
+  if len(p) + len(x) == 0:
+    if len(r) > m[0]:
+      sol.clear()
+      m[0] = len(r)
+      sol.append(r)
+    elif len(r) == m[0]:
+      sol.append(r)
+    print(r)
+  for v in list(p):
+    BK(r | {v}, p & set(g.neighbors(v)),x & set(g.neighbors(v)),g)
+    p ^= {v}
+    x |= {v}  
+  if len(r) + len(p) == 0:
+    return sol
       
 def hypercycle(g):
   if berge(g):
@@ -106,8 +144,9 @@ graph.add_edge('v3', 'E3')
 graph.add_edge('v4', 'E4')
 graph.add_edge('v5', 'E3')
 graph.add_edge('v6', 'E3')
-
+#print(alpha_acyclic(graph))
 ng = incidence_to_primal(graph)
+print(BK(set(),set(ng.nodes()),set(),ng))
 nx.draw(ng, with_labels=True)
 plt.show()
 

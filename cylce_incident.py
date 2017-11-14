@@ -1,5 +1,5 @@
-def cycle(graph):
-	x = {}
+def primal(graph):
+	x = {} 
 	prec = None
 	y = [list(i) for i in graph.edges()]
 	for i in y:
@@ -12,11 +12,10 @@ def cycle(graph):
 			else:
 				x[prec].add(elem)
 	keys = list(x.keys())
-	
 	for key in x:
+		if len(x[key]) == 1:
+			continue
+		s = set()
 		del keys[0]
-		for j in keys:
-			if len(x[key] & x[j]) >=  2:
-				return True
-	return False
-		
+		for k in keys:
+			
