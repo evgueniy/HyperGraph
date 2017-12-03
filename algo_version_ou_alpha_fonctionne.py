@@ -124,34 +124,23 @@ def check_max_cliques(g, max_cliques):
 
 def beta_acyclic(g):
     change = True
-    G = g.copy()    
+    H = g.copy()    
     
     while change and G.nodes():
         change = False
         
         for element in list(G.nodes()):
-            if "v" in element and len(list(G.neighbors(element))) <= 1:
+            if "e" in element and not list(H.neighbors(element)):
+                H.remove_node(element)
+                change = True
+                
+            elif "v" in element and (len(list(G.neighbors(element))) <= 1 or inclusion_rule(H, element)):
                 G.remove_node(element)   
                 change = True 
-                
-            elif "e" in element:
-                useless_hyperedge = True
-                for other_hyperedge in G.nodes():
-                    if element != other_hyperedge:
-                        if list(G.neighbors(element)) == list(G.neighbors(other_hyperedge)):
-                            G.remove_node(element)
-                            change = True
-                            break
-                            
-                        elif not (all(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))\
-                            or not any(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))):
-                            useless_hyperedge = False
-                        
-                if useless_hyperedge and element in G.nodes():
-                    G.remove_node(element)
-                    change = True
-         
+                    
     return True if not G.nodes() else False
+
+def inclusion_rule(g, vertex):
 
 
 def gamma_acyclic(g):
