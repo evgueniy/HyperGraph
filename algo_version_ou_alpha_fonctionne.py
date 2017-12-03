@@ -79,8 +79,6 @@ def alpha_acyclic(g):
     i = 0
     max_cliques = []
     G = incidence_to_primal(g)
-    nx.draw(G, with_labels=True)
-    plt.show()
     nodes = [node for node in G.nodes() if len(list(G.neighbors(node))) >= 1]
     previous_len = len(nodes)
     
@@ -123,30 +121,98 @@ def check_max_cliques(g, max_cliques):
         
     return True    
     
+
+def beta_acyclic(g):
+    change = True
+    G = g.copy()    
+    
+    while change and G.nodes():
+        change = False
+        
+        for element in list(G.nodes()):
+            if "v" in element and len(list(G.neighbors(element))) <= 1:
+                G.remove_node(element)   
+                change = True 
+                
+            elif "e" in element:
+                useless_hyperedge = True
+                for other_hyperedge in G.nodes():
+                    if element != other_hyperedge:
+                        if list(G.neighbors(element)) == list(G.neighbors(other_hyperedge)):
+                            G.remove_node(element)
+                            change = True
+                            break
+                            
+                        elif not (all(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))\
+                            or not any(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))):
+                            useless_hyperedge = False
+                        
+                if useless_hyperedge and element in G.nodes():
+                    G.remove_node(element)
+                    change = True
+         
+    return True if not G.nodes() else False
+
+
+def gamma_acyclic(g):
+    change = True
+    G = g.copy()    
+    
+    while change and G.nodes():
+        change = False
+        
+        for element in list(G.nodes()):
+            if "v" in element and len(list(G.neighbors(element))) <= 1:
+                G.remove_node(element)   
+                change = True 
+                
+            elif "e" in element:
+                useless_hyperedge = True
+                for other_hyperedge in G.nodes():
+                    if element != other_hyperedge:
+                        if list(G.neighbors(element)) == list(G.neighbors(other_hyperedge)):
+                            G.remove_node(element)
+                            change = True
+                            break
+                            
+                        elif not (all(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))\
+                            or not any(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))):
+                            useless_hyperedge = False
+                        
+                if useless_hyperedge and element in G.nodes():
+                    G.remove_node(element)
+                    change = True
+         
+    return True if not G.nodes() else False
+
                                     
 def hypercycle(g):
     if berge(g):
-        print("Hypergraphe acyclique au sens de Berge et α-acyclique")
-        print(alpha_acyclic(g))
+        print("Hypergraphe acyclique au sens de Berge, γ-acyclique,\
+              \nβ-acyclique et α-acyclique.")
+        
+    elif gamma_acyclic(g):
+        print("Hypergraphe γ-acyclique, β-acyclique et α-acyclique.")
+             
+    elif beta_acyclic(g):
+        print("Hypergraphe β-acyclique et α-acyclique.")
+        
     elif alpha_acyclic(g):
-        print("Hypergraphe α-acyclique")
-                                      
+        print("Hypergraphe α-acyclique.")
+                              
     else:
-        print("Hypergraphe ni acyclique au sens de Berge et ni α-acyclique")
+        print("Hypergraphe ni acyclique au sens de Berge, ni γ-acyclique,\
+               \nni β-acyclique et ni α-acyclique !")
 
-  
-def beta_acyclic(g):
-    possible_nodes = [node for node in g.nodes() if ("v" in node) and len(list(g.neighbors(node))) == 2]
-    
-    if len(possible_nodes) >= 3:
-        return False
-    
-    
 
 g = graph_generator()
-nx.draw(g, with_labels=True)
-plt.show()
-    
 hypercycle(g)
+nx.draw_circular(g, with_labels = True)
+plt.show()
+
+
+
+
+
 
 
