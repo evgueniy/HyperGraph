@@ -126,19 +126,19 @@ def beta_acyclic(g):
     change = True
     H = g.copy()    
     
-    while change and G.nodes():
+    while change and H.nodes():
         change = False
         
-        for element in list(G.nodes()):
+        for element in list(H.nodes()):
             if "e" in element and not list(H.neighbors(element)):
                 H.remove_node(element)
                 change = True
                 
-            elif "v" in element and (len(list(G.neighbors(element))) <= 1 or inclusion_rule(H, element)):
-                G.remove_node(element)   
+            elif "v" in element and (len(list(H.neighbors(element))) <= 1 or inclusion_rule(H, element)):
+                H.remove_node(element)   
                 change = True 
                     
-    return True if not G.nodes() else False
+    return True if not H.nodes() else False
 
 def inclusion_rule(g, vertex):
 
