@@ -214,16 +214,3 @@ if __name__ == "__main__":
     g = graph_generator()
     hypercycle(g)
     bipartite_draw(g)
-
-
-if __name__ == "__main__":
-    g = graph_generator()
-    hypercycle(g)
-    bipartite_draw(g)
-
-
-
-
-
-
-
