@@ -175,10 +175,26 @@ def gamma_acyclic(g):
     return True if not G.nodes() else False
 
                                     
+def bipartite_draw(g):
+    pos = {}
+    l = 0
+    r = 0
+    for elem in list(g.nodes()):
+        
+        if "v" in elem:  
+            pos.update({elem: (1, l)})
+            l += 1
+        else:
+            pos.update({elem: (2, r)})
+            r += 2
+
+    nx.draw(g, with_labels = True, pos=pos)
+    plt.show()
+                                    
 def hypercycle(g):
     if berge(g):
         print("Hypergraphe acyclique au sens de Berge, γ-acyclique,\
-              \nβ-acyclique et α-acyclique.")
+              \n β-acyclique et α-acyclique.")
         
     elif gamma_acyclic(g):
         print("Hypergraphe γ-acyclique, β-acyclique et α-acyclique.")
@@ -191,13 +207,19 @@ def hypercycle(g):
                               
     else:
         print("Hypergraphe ni acyclique au sens de Berge, ni γ-acyclique,\
-               \nni β-acyclique et ni α-acyclique !")
+               \n ni β-acyclique et ni α-acyclique !")
 
 
-g = graph_generator()
-hypercycle(g)
-nx.draw_circular(g, with_labels = True)
-plt.show()
+if __name__ == "__main__":
+    g = graph_generator()
+    hypercycle(g)
+    bipartite_draw(g)
+
+
+if __name__ == "__main__":
+    g = graph_generator()
+    hypercycle(g)
+    bipartite_draw(g)
 
 
 
