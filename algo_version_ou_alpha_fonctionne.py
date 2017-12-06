@@ -140,12 +140,16 @@ def check_max_cliques(g, max_cliques):
     return True    
 
 def delete_nest_point(dico,lst,node):
+    """ supprime les sommets et hyper arete vide"""
     for key in lst:
         dico[key] ^= {node}
         if len(dico[key]) == 0:
             del dico[key]   
 
 def hyperEdge(g):
+    """Créer un dictionnaire contenant
+    les hyper arêtes en clef et avec ses set d'arêtes
+    """
     x = list(g.edges())
     d = {}
     for i in x:
@@ -246,7 +250,7 @@ def bipartite_draw(g):
             pos.update({elem: (2, r)})
             r += 2
 
-    nx.draw(g, with_labels = True, pos=pos)
+    nx.draw(g, with_labels = True, pos=pos, node_color='b')
     plt.show()
                                     
 def hypercycle(g):
