@@ -140,7 +140,7 @@ def beta_acyclic(g):
                     
     return True if not H.nodes() else False
 
-def inclusion_rule(g, vertex):
+"""def inclusion_rule(g, vertex):"""
 
 
 def gamma_acyclic(g):

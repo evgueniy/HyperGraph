@@ -73,8 +73,8 @@ def alpha_acyclic(g):
     i = 0
     max_cliques = []
     G = incidence_to_primal(g)
-    nx.draw(G, with_labels=True)
-    plt.show()
+    #nx.draw(G, with_labels=True)
+    #plt.show()
     nodes = [node for node in G.nodes() if len(list(G.neighbors(node))) > 1]
     previous_len = len(nodes)
     
@@ -128,18 +128,95 @@ def hypercycle(g):
     else:
         print("Hypergraphe ni acyclique au sens de Berge et ni α-acyclique")
 
+def hyperEdge(g):
+    x = list(g.edges())
+    d = {}
+    for i in x:
+        prec = ''
+        for j in sorted(i):
+            if 'e' in j:
+                d.setdefault(j,set())
+                prec = j
+            else:
+                d[prec].add(j)
+    return d
+def alphac(g):
+    d = hyperEdge(g)
+    x = incidence_to_primal(g)
+    if nx.is_chordal(x):
+        l = [list(i) for i in nx.chordal_graph_cliques(x)]
+        t = 0
+        mx = []
+        for i in l:
+            if len(i) > t:
+                t = len(i)
+        if t in (0,1):
+            return True
+        for i in l:
+            if len(i) == t:
+                mx.append(i)
+        flag = [False for i in mx]
+        for i in range(len(mx)):
+            for j in d:
+                if sorted(mx[i]) == sorted(d[j]):
+                    flag[i] = True
+                    continue
+        return False if False in flag else True
+    else:
+        return False
 
+def delete_nest_point(dico,lst,node):
+    for key in lst:
+        dico[key] ^= {node}
+        if len(dico[key]) == 0:
+            del dico[key]
+    
+def beta(g):
+    source = hyperEdge(g)
+    copy = hyperEdge(g)
+    delete = True
+    while delete and len(copy) != 0:
+        delete = False
+        for key in source:
+            if key not in copy:
+                continue
+            for node in source[key]:
+                if key not in copy or node not in copy[key]:
+                    continue
+                contenu = []
+                ok = True
+                contenu.append(key)
+                for key2 in source:
+                    if key == key2 or key2 not in copy:
+                        continue
+                    if node in source[key2]:
+                        for nest in contenu:
+                            if abs(len(copy[nest]) - len(copy[key2])) != len(copy[nest]^copy[key2]):
+                                ok = False
+                                break
+                        if not ok:
+                            break
+                        else:
+                            contenu.append(key2)
+                if ok:
+                    delete = True
+                    delete_nest_point(copy,contenu,node)
+    return len(copy) == 0
+
+
+            
 g = graph_generator()
-nx.draw(g, with_labels=True)
-plt.show()
-hypercycle(g)
 
+meme = []
+while True:
+    g = graph_generator()
+    if beta(g):
+        if not alphac(g):
+            print('lul')
+            break
+        else:
+            print('ok')
 
-
-
-
-  
-  
 
 
 
