@@ -1,7 +1,7 @@
 """
 Authors : Sarah Ghiri - 000334719
-          Evgueni Kissin - 
-Date :8 decembre 2017
+          Evguéniy Starygin - 000443325
+Date : 8 decembre 2017
 """
 
 import random 
@@ -10,6 +10,9 @@ import networkx as nx
 
 
 def graph_generator():
+    """ Génère un hypergraphe de maximum 15 noeuds et 5 hyperarètes
+        sous forme d'un graphe d'incidence représenté par networkx.
+    """
     graph = nx.Graph()
     x = random.randint(7,15)
     y = random.randint(2,5)
@@ -19,12 +22,15 @@ def graph_generator():
         graph.add_node("e{}".format(i))
     for i in range(x):
         for j in range(y):
-            if random.randint(0,100) <= 25:
+            if random.randint(0,100) <= 30:
                 graph.add_edge("v{}".format(i),"e{}".format(j))
 
     return graph
 
 def incidence_to_primal(g):
+    """ Transforme le graphe d'incidence g
+        d'un hypergraphe en graphe primal renvoyé.
+    """
     G = nx.Graph()
     nodes = []
     for node in g.nodes():
@@ -44,6 +50,10 @@ def incidence_to_primal(g):
 
     
 def berge(g):
+    """ Effectue un parcours en profondeur du
+        graphe d'incidence g d'un hypergraphe pour
+        détecter un cycle. Renvoie True si acyclique.
+    """
     stack = []
     vu = []   #Pour marquer les nodes visités
     previous = {}  #Pour régler le problème d'hier
@@ -76,6 +86,8 @@ def berge(g):
     
 
 def alpha_acyclic(g):
+    """ Renvoie True si le graphe g est alpha-acyclique.
+    """
     i = 0
     max_cliques = []
     G = incidence_to_primal(g)
@@ -107,6 +119,9 @@ def alpha_acyclic(g):
 
 
 def detect_clique(neighbors, G):
+    """ Renvoie True si les noeuds de la liste neighbors
+        forment une clique tous ensemble dans le graphe primal G.
+    """
     for neighbor in neighbors:
         if not all(node in list(G.neighbors(neighbor)) for node in neighbors if node != neighbor):
             return False
@@ -114,36 +129,79 @@ def detect_clique(neighbors, G):
         
     
 def check_max_cliques(g, max_cliques):
+    """ Return True si les cliques maximales sont bien
+        des hyperarètes de l'hypergraphe g.
+    """
     hyperaretes = [sorted(list(g.neighbors(node))) for node in g.nodes() if "e" in node]
     for clique in max_cliques:
         if sorted(clique) not in hyperaretes:
             return False
         
     return True    
-    
 
-def beta_acyclic(g):
-    change = True
-    H = g.copy()    
-    
-    while change and H.nodes():
-        change = False
-        
-        for element in list(H.nodes()):
-            if "e" in element and not list(H.neighbors(element)):
-                H.remove_node(element)
-                change = True
-                
-            elif "v" in element and (len(list(H.neighbors(element))) <= 1 or inclusion_rule(H, element)):
-                H.remove_node(element)   
-                change = True 
-                    
-    return True if not H.nodes() else False
+def delete_nest_point(dico,lst,node):
+    for key in lst:
+        dico[key] ^= {node}
+        if len(dico[key]) == 0:
+            del dico[key]   
 
+def hyperEdge(g):
+    x = list(g.edges())
+    d = {}
+    for i in x:
+        prec = ''
+        for j in sorted(i):
+            if 'e' in j:
+                d.setdefault(j,set())
+                prec = j
+            else:
+                d[prec].add(j)
+    return d
+
+<<<<<<< HEAD
 """def inclusion_rule(g, vertex):"""
+=======
+def beta_acyclic(g):
+    """ Teste la beta-acyclicité du graphe d'incidence
+        g d'un hypergraphe par élimination suivant des règles.
+    """
+    source = hyperEdge(g)
+    copy = hyperEdge(g)
+    delete = True
+    while delete and len(copy) != 0:
+        delete = False
+        for key in source:
+            if key not in copy:
+                continue
+            for node in source[key]:
+                if key not in copy or node not in copy[key]:
+                    continue
+                contenu = []
+                ok = True
+                contenu.append(key)
+                for key2 in source:
+                    if key == key2 or key2 not in copy:
+                        continue
+                    if node in source[key2]:
+                        for nest in contenu:
+                            if abs(len(copy[nest]) - len(copy[key2])) != len(copy[nest]^copy[key2]):
+                                ok = False
+                                break
+                        if not ok:
+                            break
+                        else:
+                            contenu.append(key2)
+                if ok:
+                    delete = True
+                    delete_nest_point(copy,contenu,node)
+    return len(copy) == 0
+>>>>>>> origin/master
 
 
 def gamma_acyclic(g):
+    """ Teste la gamma-acyclicité du graphe d'incidence
+        g d'un hypergraphe par élimination suivant des règles.
+    """
     change = True
     G = g.copy()    
     
@@ -176,6 +234,9 @@ def gamma_acyclic(g):
 
                                     
 def bipartite_draw(g):
+    """ Fonction qui dessine les noeuds et hyperarêtes
+        du graphe d'incidence de l'hypergraphe séparément.
+    """
     pos = {}
     l = 0
     r = 0
@@ -188,26 +249,30 @@ def bipartite_draw(g):
             pos.update({elem: (2, r)})
             r += 2
 
-    nx.draw(g, with_labels = True, pos=pos)
+    nx.draw(g, with_labels = True, pos=pos, node_color='b')
     plt.show()
                                     
 def hypercycle(g):
+    """ Fonction qui teste les différentes acyclicités
+        possibles sur le graphe g et affiche le résultat.
+    """
     if berge(g):
-        print("Hypergraphe acyclique au sens de Berge, γ-acyclique,\
-              \n β-acyclique et α-acyclique.")
-        
+        print("Hypergraphe acyclique au sens de Berge, gamma-acyclique,\
+              \n beta-acyclique et alpha-acyclique.")
+               
     elif gamma_acyclic(g):
-        print("Hypergraphe γ-acyclique, β-acyclique et α-acyclique.")
+        print("Hypergraphe gamma-acyclique, beta-acyclique et alpha-acyclique.")
              
     elif beta_acyclic(g):
-        print("Hypergraphe β-acyclique et α-acyclique.")
+        print("Hypergraphe beta-acyclique et alpha-acyclique.")
         
     elif alpha_acyclic(g):
-        print("Hypergraphe α-acyclique.")
+        print("Hypergraphe alpha-acyclique.")
                               
     else:
-        print("Hypergraphe ni acyclique au sens de Berge, ni γ-acyclique,\
-               \n ni β-acyclique et ni α-acyclique !")
+        print("Hypergraphe ni acyclique au sens de Berge, ni gamma-acyclique,\
+               \n ni beta-acyclique et ni alpha-acyclique !")
+         
 
 
 if __name__ == "__main__":
