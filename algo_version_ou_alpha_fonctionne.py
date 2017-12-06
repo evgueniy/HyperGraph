@@ -123,6 +123,9 @@ def check_max_cliques(g, max_cliques):
     
 
 def beta_acyclic(g):
+    """ Teste la beta-acyclicité du graphe d'incidence
+        g d'un hypergraphe par élimination suivant des règles.
+    """
     change = True
     H = g.copy()    
     
@@ -141,9 +144,12 @@ def beta_acyclic(g):
     return True if not H.nodes() else False
 
 def inclusion_rule(g, vertex):
-
+    return None
 
 def gamma_acyclic(g):
+    """ Teste la gamma-acyclicité du graphe d'incidence
+        g d'un hypergraphe par élimination suivant des règles.
+    """
     change = True
     G = g.copy()    
     
@@ -176,6 +182,9 @@ def gamma_acyclic(g):
 
                                     
 def bipartite_draw(g):
+    """ Fonction qui dessine les noeuds et hyperarêtes
+        du graphe d'incidence de l'hypergraphe séparément.
+    """
     pos = {}
     l = 0
     r = 0
@@ -188,26 +197,29 @@ def bipartite_draw(g):
             pos.update({elem: (2, r)})
             r += 2
 
-    nx.draw(g, with_labels = True, pos=pos)
+    nx.draw(g, with_labels = True, pos=pos, node_color='b')
     plt.show()
                                     
 def hypercycle(g):
+    """ Fonction qui teste les différentes acyclicités
+        possibles sur le graphe g et affiche le résultat.
+    """
     if berge(g):
-        print("Hypergraphe acyclique au sens de Berge, γ-acyclique,\
-              \n β-acyclique et α-acyclique.")
+        print("Hypergraphe acyclique au sens de Berge, gamma-acyclique,\
+              \n beta-acyclique et alpha-acyclique.")
         
     elif gamma_acyclic(g):
-        print("Hypergraphe γ-acyclique, β-acyclique et α-acyclique.")
+        print("Hypergraphe gamma-acyclique, beta-acyclique et alpha-acyclique.")
              
     elif beta_acyclic(g):
-        print("Hypergraphe β-acyclique et α-acyclique.")
+        print("Hypergraphe beta-acyclique et alpha-acyclique.")
         
     elif alpha_acyclic(g):
-        print("Hypergraphe α-acyclique.")
+        print("Hypergraphe alpha-acyclique.")
                               
     else:
-        print("Hypergraphe ni acyclique au sens de Berge, ni γ-acyclique,\
-               \n ni β-acyclique et ni α-acyclique !")
+        print("Hypergraphe ni acyclique au sens de Berge, ni gamma-acyclique,\
+               \n ni beta-acyclique et ni alpha-acyclique !")
 
 
 if __name__ == "__main__":
