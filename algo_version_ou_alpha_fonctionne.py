@@ -158,9 +158,7 @@ def hyperEdge(g):
                 d[prec].add(j)
     return d
 
-<<<<<<< HEAD
-"""def inclusion_rule(g, vertex):"""
-=======
+
 def beta_acyclic(g):
     """ Teste la beta-acyclicité du graphe d'incidence
         g d'un hypergraphe par élimination suivant des règles.
@@ -195,7 +193,6 @@ def beta_acyclic(g):
                     delete = True
                     delete_nest_point(copy,contenu,node)
     return len(copy) == 0
->>>>>>> origin/master
 
 
 def gamma_acyclic(g):
