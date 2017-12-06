@@ -84,40 +84,60 @@ def berge(g):
         
     return True
     
-def gamma_acyclic(g):
-    """ Teste la gamma-acyclicité du graphe d'incidence
-        g d'un hypergraphe par élimination suivant des règles.
-    """
-    change = True
-    G = g.copy()    
-    
-    while change and G.nodes():
-        change = False
-        
-        for element in list(G.nodes()):
-            if "v" in element and len(list(G.neighbors(element))) <= 1:
-                G.remove_node(element)   
-                change = True 
-                
-            elif "e" in element:
-                useless_hyperedge = True
-                for other_hyperedge in G.nodes():
-                    if element != other_hyperedge:
-                        if list(G.neighbors(element)) == list(G.neighbors(other_hyperedge)):
-                            G.remove_node(element)
-                            change = True
-                            break
-                            
-                        elif not (all(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))\
-                            or not any(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))):
-                            useless_hyperedge = False
-                        
-                if useless_hyperedge and element in G.nodes():
-                    G.remove_node(element)
-                    change = True
-         
-    return True if not G.nodes() else False
 
+def alpha_acyclic(g):
+    """ Renvoie True si le graphe g est alpha-acyclique.
+    """
+    i = 0
+    max_cliques = []
+    G = incidence_to_primal(g)
+    nodes = [node for node in G.nodes() if len(list(G.neighbors(node))) >= 1]
+    previous_len = len(nodes)
+    
+    while nodes:
+        
+        v = nodes[i]
+        neighbors = [neighbor for neighbor in G.neighbors(v) if neighbor in nodes]
+        
+        if detect_clique(neighbors, G):
+            nodes.remove(v)
+            neighbors.append(v)
+            if not max_cliques or len(max_cliques[0]) == len(neighbors):
+                max_cliques.append(neighbors)
+            elif len(max_cliques[0]) < len(neighbors):
+                del max_cliques[:]
+                max_cliques.append(neighbors)
+        i += 1
+        if i >= len(nodes) and len(nodes) == previous_len:
+            return False
+
+        elif i >= len(nodes) and len(nodes) != previous_len:
+            previous_len = len(nodes)
+            i = 0
+    
+    return True if check_max_cliques(g, max_cliques) else False
+
+
+def detect_clique(neighbors, G):
+    """ Renvoie True si les noeuds de la liste neighbors
+        forment une clique tous ensemble dans le graphe primal G.
+    """
+    for neighbor in neighbors:
+        if not all(node in list(G.neighbors(neighbor)) for node in neighbors if node != neighbor):
+            return False
+    return True
+        
+    
+def check_max_cliques(g, max_cliques):
+    """ Return True si les cliques maximales sont bien
+        des hyperarètes de l'hypergraphe g.
+    """
+    hyperaretes = [sorted(list(g.neighbors(node))) for node in g.nodes() if "e" in node]
+    for clique in max_cliques:
+        if sorted(clique) not in hyperaretes:
+            return False
+        
+    return True    
 
 def delete_nest_point(dico,lst,node):
     """ supprime les sommets et hyper arete vide"""
@@ -179,59 +199,39 @@ def beta_acyclic(g):
     return len(copy) == 0
 
 
-def alpha_acyclic(g):
-    """ Renvoie True si le graphe g est alpha-acyclique.
+def gamma_acyclic(g):
+    """ Teste la gamma-acyclicité du graphe d'incidence
+        g d'un hypergraphe par élimination suivant des règles.
     """
-    i = 0
-    max_cliques = []
-    G = incidence_to_primal(g)
-    nodes = [node for node in G.nodes() if len(list(G.neighbors(node))) >= 1]
-    previous_len = len(nodes)
+    change = True
+    G = g.copy()    #test
     
-    while nodes:
+    while change and G.nodes():
+        change = False
         
-        v = nodes[i]
-        neighbors = [neighbor for neighbor in G.neighbors(v) if neighbor in nodes]
-        
-        if detect_clique(neighbors, G):
-            nodes.remove(v)
-            neighbors.append(v)
-            if not max_cliques or len(max_cliques[0]) == len(neighbors):
-                max_cliques.append(neighbors)
-            elif len(max_cliques[0]) < len(neighbors):
-                del max_cliques[:]
-                max_cliques.append(neighbors)
-        i += 1
-        if i >= len(nodes) and len(nodes) == previous_len:
-            return False
-
-        elif i >= len(nodes) and len(nodes) != previous_len:
-            previous_len = len(nodes)
-            i = 0
-    
-    return True if check_max_cliques(g, max_cliques) else False
-
-
-def detect_clique(neighbors, G):
-    """ Renvoie True si les noeuds de la liste neighbors
-        forment une clique tous ensemble dans le graphe primal G.
-    """
-    for neighbor in neighbors:
-        if not all(node in list(G.neighbors(neighbor)) for node in neighbors if node != neighbor):
-            return False
-    return True
-        
-    
-def check_max_cliques(g, max_cliques):
-    """ Return True si les cliques maximales sont bien
-        des hyperarètes de l'hypergraphe g.
-    """
-    hyperaretes = [sorted(list(g.neighbors(node))) for node in g.nodes() if "e" in node]
-    for clique in max_cliques:
-        if sorted(clique) not in hyperaretes:
-            return False
-        
-    return True    
+        for element in list(G.nodes()):
+            if "v" in element and len(list(G.neighbors(element))) <= 1:
+                G.remove_node(element)   
+                change = True 
+                
+            elif "e" in element:
+                useless_hyperedge = True
+                for other_hyperedge in G.nodes():
+                    if element != other_hyperedge:
+                        if list(G.neighbors(element)) == list(G.neighbors(other_hyperedge)):
+                            G.remove_node(element)
+                            change = True
+                            break
+                            
+                        elif not (all(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))\
+                            or not any(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))):
+                            useless_hyperedge = False
+                        
+                if useless_hyperedge and element in G.nodes():
+                    G.remove_node(element)
+                    change = True
+         
+    return True if not G.nodes() else False
 
                                     
 def bipartite_draw(g):
