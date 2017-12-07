@@ -60,8 +60,8 @@ def berge(g):
     l = [node for node in g.nodes() if len(list(g.neighbors(node))) > 1]
     #Liste des nodes du graphe
   
-    while l: 
-        node = l.pop()   #Premier noeud qu'on visite
+    while l:
+        node = l[0]   #Premier noeud qu'on visite
         previous[node] = None   #Pas de previous pour celui-là
 
         if node not in vu:   
@@ -71,18 +71,19 @@ def berge(g):
                 vertex = stack.pop()   
                 if vertex not in vu:
                     vu.append(vertex)   #Marque le noeud
-                    L = list(g.neighbors(vertex))   #Voisins du noeud
+                    if vertex in l:  #Pour pas repasser pour rien
+                        l.remove(vertex) 
+                    neighbors = list(g.neighbors(vertex))   #Voisins du noeud
           
-                    for node in L:
-                        if ((node in vu and node != previous[vertex]) or (node not in vu)):
-                        #On ajoute les voisins au stacks sauf son précedent déjà visité
+                    for node in neighbors:
+                        if node in vu and node != previous[vertex]:
+                            #Quand on tombe sur un noeud déjà marqué non précédent, il y a un cycle
+                            return False
+                        elif node not in vu:
+                        #On ajoute les voisins au stack sauf son précédent déjà visité
                             stack.append(node)
                             previous[node] = vertex   #Le previous des voisins est le noeud courant
-          
-                elif vertex in vu:
-                    #Quand on tombe sur un noeud déjà marqué, il y a un cycle
-                    return False
-        
+                      
     return True
     
 def gamma_acyclic(g):
@@ -115,7 +116,6 @@ def gamma_acyclic(g):
                             or not any(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))):
                             useless_hyperedge = False
                         #Pour savoir si un hyperedge répond à la règle 2 des gammas.
-
                         
                 if useless_hyperedge and element in G.nodes():
                     #Si suit la règle 2 --> suppression.
@@ -290,8 +290,7 @@ def hypercycle(g):
     else:
         print("Hypergraphe ni acyclique au sens de Berge, ni gamma-acyclique,\
                \n ni beta-acyclique et ni alpha-acyclique !")
-         
-
+     
 
 if __name__ == "__main__":
     g = graph_generator()
