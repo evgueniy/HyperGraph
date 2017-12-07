@@ -292,10 +292,13 @@ def hypercycle(g):
     else:
         print("Hypergraphe ni acyclique au sens de Berge, ni gamma-acyclique,\
                \n ni beta-acyclique et ni alpha-acyclique !")
-     
 
-if __name__ == "__main__":
+def main():
     g = graph_generator()
     hypercycle(g)
     bipartite_draw(g)
+    
+          
+if __name__ == "__main__":
+    main()
     
