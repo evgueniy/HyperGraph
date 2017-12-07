@@ -106,6 +106,7 @@ def gamma_acyclic(g):
                 useless_hyperedge = True
                 for other_hyperedge in G.nodes():
                     if "e" in other_hyperedge:
+                        #Pour éviter d'itérer sur tous les nodes les all et any
                         if element != other_hyperedge:
                             if list(G.neighbors(element)) == list(G.neighbors(other_hyperedge)):
                                 #Suppression des hyperedges exactement égales à un autre.
