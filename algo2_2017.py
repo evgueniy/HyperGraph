@@ -269,7 +269,7 @@ def bipartite_draw(g):
             pos.update({elem: (2, r)})
             r += 2
 
-    nx.draw(g, with_labels = True, pos=pos, node_color='b')
+    nx.draw(g, with_labels = True, pos=pos)
     plt.show()
                                     
 def hypercycle(g):
