@@ -105,17 +105,18 @@ def gamma_acyclic(g):
             elif "e" in element:
                 useless_hyperedge = True
                 for other_hyperedge in G.nodes():
-                    if element != other_hyperedge:
-                        if list(G.neighbors(element)) == list(G.neighbors(other_hyperedge)):
-                            #Suppression des hyperedges exactement égales à un autre.
-                            G.remove_node(element)
-                            change = True
-                            break
-                            
-                        elif not (all(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))\
-                            or not any(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))):
-                            useless_hyperedge = False
-                        #Pour savoir si un hyperedge répond à la règle 2 des gammas.
+                    if "e" in other_hyperedge:
+                        if element != other_hyperedge:
+                            if list(G.neighbors(element)) == list(G.neighbors(other_hyperedge)):
+                                #Suppression des hyperedges exactement égales à un autre.
+                                G.remove_node(element)
+                                change = True
+                                break
+                                
+                            elif not (all(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))\
+                                or not any(neighbors in list(G.neighbors(other_hyperedge)) for neighbors in list(G.neighbors(element)))):
+                                useless_hyperedge = False
+                            #Pour savoir si un hyperedge répond à la règle 2 des gammas.
                         
                 if useless_hyperedge and element in G.nodes():
                     #Si suit la règle 2 --> suppression.
