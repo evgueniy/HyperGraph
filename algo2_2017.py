@@ -10,7 +10,7 @@ import networkx as nx
 
 
 def graph_generator():
-    """ Génère un hypergraphe de maximum 15 noeuds et 5 hyperarètes
+    """ Génère un hypergraphe de maximum 15 vertex et 5 hyperedges
         sous forme d'un graphe d'incidence représenté par networkx.
     """
     graph = nx.Graph()
@@ -41,11 +41,11 @@ def incidence_to_primal(g):
     for node in nodes:
         test = nodes[:]
         test.remove(node)
-        for other in test:
+        for other_node in test:
             L1 = list(g.neighbors(node))
-            L2 = list(g.neighbors(other))
-            if any(e in L1 for e in L2):
-                G.add_edge(node, other)
+            L2 = list(g.neighbors(other_node))
+            if any(edge in L1 for edge in L2):
+                G.add_edge(node, other_node)
     return G
 
     
@@ -57,7 +57,8 @@ def berge(g):
     stack = []
     vu = []   #Pour marquer les nodes visités
     previous = {}  
-    l = [node for node in g.nodes() if len(list(g.neighbors(node))) > 1]   #Liste des nodes du graphe
+    l = [node for node in g.nodes() if len(list(g.neighbors(node))) > 1]
+    #Liste des nodes du graphe
   
     while l: 
         node = l.pop()   #Premier noeud qu'on visite
@@ -296,3 +297,4 @@ if __name__ == "__main__":
     g = graph_generator()
     hypercycle(g)
     bipartite_draw(g)
+    
