@@ -149,6 +149,13 @@ def hyperEdge(g):
     return d
 
 
+def isNestPoint(hyperE,lst,key):
+    """ Verifie si le point est bien un nest"""
+    for nest in lst: # on regarde si chaque hyper edge de la liste est un sous ensemble ou key2 est un sous ensemble de ces derniers
+        if abs(len(hyperE[nest]) - len(hyperE[key])) != len(hyperE[nest]^hyperE[key]): #si un des hyper edge n'est pas un sous ensemble de l'autre
+            return False # pas un nest point
+    return True
+
 def beta_acyclic(g):
     """ Teste la beta-acyclicité du graphe d'incidence
         g d'un hypergraphe par élimination suivant des règles.
@@ -159,30 +166,25 @@ def beta_acyclic(g):
     while delete and len(copy) != 0: # et qu'on possède toujours une hyper edge
         delete = False
         for key in source: #pour les hyper edges dans le dico
-            if key not in copy: #si supprimer on passe à la suivante
-                continue
-            for node in source[key]: #les sommets dans l'hyper arête
-                if key not in copy or node not in copy[key]: #si plus d'hyper arrête ou de sommets on passe à la suivante
-                    continue 
-                contenu = [] #liste des différents hyper edge contenant le sommet node
-                ok = True # si chaque hyper arête contenant node est un sous ensemble 
-                contenu.append(key)
-                for key2 in source: #2 eme parcours du dico pour comparer
-                    if key == key2 or key2 not in copy: #idem
-                        continue
-                    if node in source[key2]: #si le sommets est contenu dans l'hyper arête key2
-                        for nest in contenu: # on regarde si chaque hyper edge de la liste est un sous ensemble ou key2 est un sous ensemble de ces derniers
-                            if abs(len(copy[nest]) - len(copy[key2])) != len(copy[nest]^copy[key2]): #si un des hyper edge n'est pas un sous ensemble de l'autre
-                                ok = False #pas de suppression
-                                break #sortie de boucle
-                        if not ok: #on sort
-                            break
-                        else:
-                            contenu.append(key2) #on ajoute l'hyper edge à la liste
-                if ok:
-                    delete = True #au moin un sommet a été supprimé
-                    delete_nest_point(copy,contenu,node) # on enlève l'élement du dico copy
-    return len(copy) == 0 #retourne bool si dico vide
+            if key in copy: #si  pas supprimer on passe à la suivante
+                for node in source[key]: #les sommets dans l'hyper arête
+                    if key in copy and node in copy[key]: #si plus d'hyper arrête ou de sommets on passe à la suivante
+                        contenu = [] #liste des différents hyper edge contenant le sommet node
+                        ok = True # si chaque hyper arête contenant node est un sous ensemble 
+                        contenu.append(key)
+                        for key2 in source: #2 eme parcours du dico pour comparer
+                            if key != key2 and key2 in copy: #idem
+                                if node in source[key2]: #si le sommets est contenu dans l'hyper arête key2
+                                    ok = isNestPoint(copy,contenu,key2)
+                                    if not ok: #on sort
+                                        break
+                                    else:
+                                        contenu.append(key2) #on ajoute l'hyper edge à la liste
+                        if ok:
+                            delete = True #au moin un sommet a été supprimé
+                            delete_nest_point(copy,contenu,node) # on enlève l'élement du dico copy
+    return len(copy) == 0 
+
 
 
 def alpha_acyclic(g):
